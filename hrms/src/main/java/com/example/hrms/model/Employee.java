@@ -13,9 +13,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "employees")
+@Table(name = "employees", uniqueConstraints = {
+		@UniqueConstraint(name = "uk_employee_email", columnNames = { "email" }) })
 public class Employee {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -115,7 +117,7 @@ public class Employee {
 	public void setDesignation(String designation) {
 		this.designation = designation;
 	}
-	
+
 	public void setStatus(EmployeeStatus status) {
 		this.status = status;
 	}

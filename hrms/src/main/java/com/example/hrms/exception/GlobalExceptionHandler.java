@@ -66,12 +66,23 @@ public class GlobalExceptionHandler {
 			DataIntegrityViolationException exception) {
 		Map<String, String> errors = new HashMap<>();
 		if (exception.getMessage() != null
-				&& exception.getMessage().contains("employees.UKj9xgmd0ya5jmus09o0b8pqrpb")) {
+				&& exception.getMessage().contains("uk_employee_email")) {
 			errors.put("message", "Email Already Taken");
 		} else {
 			errors.put("message", "Data Integrity Violation");
 		}
 		ApiErrorResponse errorResponse = new ApiErrorResponse(LocalDateTime.now(), errors.get("message"), false, null);
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ApiErrorResponse> handleUnexpectedException(Exception exception) {
+
+		System.err.println(exception.getMessage());
+
+		ApiErrorResponse errorResponse = new ApiErrorResponse(LocalDateTime.now(), "An unexpected error occurred",
+				false, null);
+
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 	}
 }
