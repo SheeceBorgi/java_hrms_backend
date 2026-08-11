@@ -12,7 +12,7 @@ public class EmployeeUpdateRequest {
 	private String phone;
 
 	@NotBlank
-	private String department;
+	private Long departmentId;
 
 	@NotBlank
 	private String designation;
@@ -41,12 +41,12 @@ public class EmployeeUpdateRequest {
 		this.phone = phone;
 	}
 
-	public String getDepartment() {
-		return department;
+	public Long getDepartmentId() {
+		return departmentId;
 	}
 
-	public void setDepartment(String department) {
-		this.department = department;
+	public void setDepartmentId(Long departmentId) {
+		this.departmentId = departmentId;
 	}
 
 	public String getDesignation() {

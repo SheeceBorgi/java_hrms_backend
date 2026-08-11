@@ -12,6 +12,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -33,20 +35,29 @@ public class Employee {
 	private String email;
 
 	private String phone;
-	private String department;
+
+	@ManyToOne
+	@JoinColumn(name = "department_id", nullable = false)
+	private Department department;
+
+	@Column(nullable = false)
 	private String designation;
+
+	@Column(nullable = false)
 	private LocalDate joiningDate;
+
+	@Column(nullable = false)
 	private BigDecimal salary;
 
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private EmployeeStatus status;
 
 	protected Employee() {
 	}
 
-	public Employee(String firstName, String lastName, String email, String phone, String department,
+	public Employee(String firstName, String lastName, String email, String phone, Department department,
 			String designation, LocalDate joiningDate, BigDecimal salary) {
-		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
@@ -78,7 +89,7 @@ public class Employee {
 		return phone;
 	}
 
-	public String getDepartment() {
+	public Department getDepartment() {
 		return department;
 	}
 
@@ -110,7 +121,7 @@ public class Employee {
 		this.phone = phone;
 	}
 
-	public void setDepartment(String department) {
+	public void setDepartment(Department department) {
 		this.department = department;
 	}
 

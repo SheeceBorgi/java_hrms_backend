@@ -10,7 +10,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 @ValidEmployeeFilter
 public class EmployeeFilterRequest {
-    private String department;
+    private Long departmentId;
     private String search;
     private EmployeeStatus status;
     private LocalDate joiningStartDate;
@@ -20,12 +20,12 @@ public class EmployeeFilterRequest {
     @PositiveOrZero
     private BigDecimal maxSalary;
 
-    public String getDepartment() {
-        return department;
+    public Long getDepartmentId() {
+        return departmentId;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
     }
 
     public String getSearch() {

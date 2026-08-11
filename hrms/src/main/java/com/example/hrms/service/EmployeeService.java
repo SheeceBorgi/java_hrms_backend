@@ -1,7 +1,5 @@
 package com.example.hrms.service;
 
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,10 +11,12 @@ import com.example.hrms.dto.EmployeeFilterRequest;
 import com.example.hrms.dto.EmployeeResponse;
 import com.example.hrms.dto.EmployeeUpdateRequest;
 import com.example.hrms.dto.PageResponse;
+import com.example.hrms.exception.DepartmentNotFoundException;
 import com.example.hrms.exception.DuplicateEmailException;
 import com.example.hrms.exception.EmployeeNotFoundException;
 import com.example.hrms.exception.IllegalEmployeeIdException;
 import com.example.hrms.mapper.EmployeeMapper;
+import com.example.hrms.model.Department;
 import com.example.hrms.model.Employee;
 import com.example.hrms.repository.EmployeeRepository;
 import com.example.hrms.specification.EmployeeSpecification;
@@ -27,20 +27,24 @@ import jakarta.transaction.Transactional;
 public class EmployeeService {
 	private final EmployeeRepository employeeRepository;
 	private final EmployeeMapper employeeMapper;
+	private final DepartmentService departmentService;
 
-	public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper) {
+	public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper,
+			DepartmentService departmentService) {
 		this.employeeRepository = employeeRepository;
 		this.employeeMapper = employeeMapper;
+		this.departmentService = departmentService;
 	}
 
 	public EmployeeResponse createEmployee(EmployeeCreateRequest request) {
-		Optional<Employee> existingEmployee = employeeRepository.findByEmail(request.getEmail());
-		if (existingEmployee.isPresent()) {
+		if (employeeRepository.findByEmail(request.getEmail()).isPresent())
 			throw new DuplicateEmailException();
-		}
+
+		Department department = departmentService.findByIdAndStatus(request.getDepartmentId())
+				.orElseThrow(DepartmentNotFoundException::new);
 
 		Employee newEmployee = new Employee(request.getFirstName(), request.getLastName(), request.getEmail(),
-				request.getPhone(), request.getDepartment(), request.getDesignation(), request.getJoiningDate(),
+				request.getPhone(), department, request.getDesignation(), request.getJoiningDate(),
 				request.getSalary());
 
 		Employee savedEmployee = employeeRepository.save(newEmployee);
@@ -52,7 +56,7 @@ public class EmployeeService {
 
 		Specification<Employee> employeeSpecification = Specification
 				.where(EmployeeSpecification.hasStatus(filter.getStatus()))
-				.and(EmployeeSpecification.hasDepartment(filter.getDepartment()))
+				.and(EmployeeSpecification.hasDepartment(filter.getDepartmentId()))
 				.and(EmployeeSpecification.nameContains(filter.getSearch()))
 				.and(EmployeeSpecification.joiningDateRange(filter.getJoiningStartDate(), filter.getJoiningEndDate()))
 				.and(EmployeeSpecification.salaryRange(filter.getMinSalary(), filter.getMaxSalary()));
@@ -61,14 +65,9 @@ public class EmployeeService {
 
 		Page<EmployeeResponse> employeeResponses = employees.map(employeeMapper::toResponse);
 
-		return new PageResponse<>(
-				employeeResponses.getContent(),
-				employeeResponses.getNumber(),
-				employeeResponses.getSize(),
-				employeeResponses.getTotalElements(),
-				employeeResponses.getTotalPages(),
-				employeeResponses.isFirst(),
-				employeeResponses.isLast());
+		return new PageResponse<>(employeeResponses.getContent(), employeeResponses.getNumber(),
+				employeeResponses.getSize(), employeeResponses.getTotalElements(), employeeResponses.getTotalPages(),
+				employeeResponses.isFirst(), employeeResponses.isLast());
 	}
 
 	public EmployeeResponse getEmployeeById(Long id) {
@@ -88,7 +87,11 @@ public class EmployeeService {
 		}
 		Employee employee = employeeRepository.findByIdAndStatus(id, EmployeeStatus.ACTIVE)
 				.orElseThrow(EmployeeNotFoundException::new);
-		employee.setDepartment(request.getDepartment());
+
+		Department department = departmentService.findByIdAndStatus(request.getDepartmentId())
+				.orElseThrow(DepartmentNotFoundException::new);
+
+		employee.setDepartment(department);
 		employee.setDesignation(request.getDesignation());
 		employee.setFirstName(request.getFirstName());
 		employee.setLastName(request.getLastName());

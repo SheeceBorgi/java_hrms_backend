@@ -11,13 +11,13 @@ public class EmployeeResponse {
 	private String lastName;
 	private String email;
 	private String phone;
-	private String department;
+	private DepartmentResponse department;
 	private String designation;
 	private LocalDate joiningDate;
 	private BigDecimal salary;
 	private EmployeeStatus status;
 
-	public EmployeeResponse(Long id, String firstName, String lastName, String email, String phone, String department,
+	public EmployeeResponse(Long id, String firstName, String lastName, String email, String phone, DepartmentResponse department,
 			String designation, LocalDate joiningDate, BigDecimal salary, EmployeeStatus employeeStatus) {
 		this.id = id;
 		this.firstName = firstName;
@@ -51,7 +51,7 @@ public class EmployeeResponse {
 		return phone;
 	}
 
-	public String getDepartment() {
+	public DepartmentResponse getDepartment() {
 		return department;
 	}
 
