@@ -4,10 +4,12 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.hrms.constant.EmployeeStatus;
 import com.example.hrms.dto.EmployeeCreateRequest;
+import com.example.hrms.dto.EmployeeFilterRequest;
 import com.example.hrms.dto.EmployeeResponse;
 import com.example.hrms.dto.EmployeeUpdateRequest;
 import com.example.hrms.dto.PageResponse;
@@ -17,6 +19,7 @@ import com.example.hrms.exception.IllegalEmployeeIdException;
 import com.example.hrms.mapper.EmployeeMapper;
 import com.example.hrms.model.Employee;
 import com.example.hrms.repository.EmployeeRepository;
+import com.example.hrms.specification.EmployeeSpecification;
 
 import jakarta.transaction.Transactional;
 
@@ -45,13 +48,27 @@ public class EmployeeService {
 		return employeeMapper.toResponse(savedEmployee);
 	}
 
-	public PageResponse<EmployeeResponse> findAllEmployees(Pageable pageable) {
-		Page<Employee> employees = employeeRepository.findAllByStatus(EmployeeStatus.ACTIVE, pageable);
+	public PageResponse<EmployeeResponse> findAllEmployees(EmployeeFilterRequest filter, Pageable pageable) {
+
+		Specification<Employee> employeeSpecification = Specification
+				.where(EmployeeSpecification.hasStatus(filter.getStatus()))
+				.and(EmployeeSpecification.hasDepartment(filter.getDepartment()))
+				.and(EmployeeSpecification.nameContains(filter.getSearch()))
+				.and(EmployeeSpecification.joiningDateRange(filter.getJoiningStartDate(), filter.getJoiningEndDate()))
+				.and(EmployeeSpecification.salaryRange(filter.getMinSalary(), filter.getMaxSalary()));
+
+		Page<Employee> employees = employeeRepository.findAll(employeeSpecification, pageable);
+
 		Page<EmployeeResponse> employeeResponses = employees.map(employeeMapper::toResponse);
 
-		return new PageResponse<>(employeeResponses.getContent(), employeeResponses.getNumber(),
-				employeeResponses.getSize(), employeeResponses.getTotalElements(), employeeResponses.getTotalPages(),
-				employeeResponses.isFirst(), employeeResponses.isLast());
+		return new PageResponse<>(
+				employeeResponses.getContent(),
+				employeeResponses.getNumber(),
+				employeeResponses.getSize(),
+				employeeResponses.getTotalElements(),
+				employeeResponses.getTotalPages(),
+				employeeResponses.isFirst(),
+				employeeResponses.isLast());
 	}
 
 	public EmployeeResponse getEmployeeById(Long id) {

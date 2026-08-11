@@ -1,21 +1,30 @@
 package com.example.hrms.controller;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.hrms.constant.EmployeeStatus;
 import com.example.hrms.dto.ApiSuccessResponse;
+import com.example.hrms.dto.CommonPageRequest;
 import com.example.hrms.dto.EmployeeCreateRequest;
+import com.example.hrms.dto.EmployeeFilterRequest;
 import com.example.hrms.dto.EmployeeResponse;
 import com.example.hrms.dto.EmployeeUpdateRequest;
 import com.example.hrms.dto.PageResponse;
@@ -42,10 +51,22 @@ public class EmployeeController {
 	}
 
 	@GetMapping
-	public ResponseEntity<ApiSuccessResponse<PageResponse<EmployeeResponse>>> findAllEmployees(Pageable pageable) {
-		PageResponse<EmployeeResponse> pageResponse = employeeService.findAllEmployees(pageable);
+	public ResponseEntity<ApiSuccessResponse<PageResponse<EmployeeResponse>>> findAllEmployees(
+			@ModelAttribute @Valid CommonPageRequest commonPageRequest,
+			@ModelAttribute @Valid EmployeeFilterRequest filter) {
+
+		Sort pageSort = Sort.by(
+				commonPageRequest.getSortDirection().equalsIgnoreCase("desc")
+						? Sort.Direction.DESC
+						: Sort.Direction.ASC,
+				commonPageRequest.getSortBy());
+		Pageable pageRequest = PageRequest.of(commonPageRequest.getPage() - 1, commonPageRequest.getLength(), pageSort);
+
+		PageResponse<EmployeeResponse> pageResponse = employeeService.findAllEmployees(filter, pageRequest);
+
 		ApiSuccessResponse<PageResponse<EmployeeResponse>> response = new ApiSuccessResponse<PageResponse<EmployeeResponse>>(
 				LocalDateTime.now(), "All Employees Fetched", true, pageResponse);
+
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 

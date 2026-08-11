@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiErrorResponse> handleValidationException(MethodArgumentNotValidException exception) {
 		Map<String, String> errors = new HashMap<>();
-		exception.getBindingResult().getFieldErrors().stream()
+		exception.getBindingResult().getFieldErrors()
 				.forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 		ApiErrorResponse errorResponse = new ApiErrorResponse(LocalDateTime.now(), "Validation Failed", false, errors);
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -65,8 +65,13 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolationException(
 			DataIntegrityViolationException exception) {
 		Map<String, String> errors = new HashMap<>();
-		ApiErrorResponse errorResponse = new ApiErrorResponse(LocalDateTime.now(), "Data Integrity Violation", false,
-				errors);
+		if (exception.getMessage() != null
+				&& exception.getMessage().contains("employees.UKj9xgmd0ya5jmus09o0b8pqrpb")) {
+			errors.put("message", "Email Already Taken");
+		} else {
+			errors.put("message", "Data Integrity Violation");
+		}
+		ApiErrorResponse errorResponse = new ApiErrorResponse(LocalDateTime.now(), errors.get("message"), false, null);
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
 	}
 }
