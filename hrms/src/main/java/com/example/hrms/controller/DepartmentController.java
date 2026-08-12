@@ -83,7 +83,7 @@ public class DepartmentController {
 			@PathVariable @Positive Long id) {
 		DepartmentResponse departmentResponse = departmentService.deactivateById(id);
 		ApiSuccessResponse<DepartmentResponse> response = new ApiSuccessResponse<>(LocalDateTime.now(),
-				"Department Created", true, departmentResponse);
+				"Department Deactivated", true, departmentResponse);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 }

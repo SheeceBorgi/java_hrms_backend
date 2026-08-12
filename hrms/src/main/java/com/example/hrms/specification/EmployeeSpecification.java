@@ -8,6 +8,8 @@ import org.springframework.data.jpa.domain.Specification;
 import com.example.hrms.constant.EmployeeStatus;
 import com.example.hrms.model.Employee;
 
+import jakarta.persistence.criteria.JoinType;
+
 public class EmployeeSpecification {
 	public static Specification<Employee> hasStatus(EmployeeStatus status) {
 		return (root, query, criteriaBuilder) -> {
@@ -64,6 +66,15 @@ public class EmployeeSpecification {
 			}
 			if (maxSalary != null) {
 				return criteriaBuilder.lessThanOrEqualTo(root.get(salaryAttribute), maxSalary);
+			}
+			return criteriaBuilder.conjunction();
+		};
+	}
+
+	public static Specification<Employee> fetchDepartment(Long id) {
+		return (root, query, criteriaBuilder) -> {
+			if (query.getResultType() != Long.class && query.getResultType() != long.class) {
+				root.fetch("department", JoinType.INNER);
 			}
 			return criteriaBuilder.conjunction();
 		};
