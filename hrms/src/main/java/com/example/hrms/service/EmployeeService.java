@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.example.hrms.constant.CommonStatus;
 import com.example.hrms.constant.EmployeeStatus;
 import com.example.hrms.dto.EmployeeCreateRequest;
 import com.example.hrms.dto.EmployeeFilterRequest;
@@ -18,6 +19,7 @@ import com.example.hrms.exception.IllegalEmployeeIdException;
 import com.example.hrms.mapper.EmployeeMapper;
 import com.example.hrms.model.Department;
 import com.example.hrms.model.Employee;
+import com.example.hrms.repository.DepartmentRepository;
 import com.example.hrms.repository.EmployeeRepository;
 import com.example.hrms.specification.EmployeeSpecification;
 
@@ -27,20 +29,20 @@ import jakarta.transaction.Transactional;
 public class EmployeeService {
 	private final EmployeeRepository employeeRepository;
 	private final EmployeeMapper employeeMapper;
-	private final DepartmentService departmentService;
+	private final DepartmentRepository departmentRepository;
 
 	public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper,
-			DepartmentService departmentService) {
+			DepartmentRepository departmentRepository) {
 		this.employeeRepository = employeeRepository;
 		this.employeeMapper = employeeMapper;
-		this.departmentService = departmentService;
+		this.departmentRepository = departmentRepository;
 	}
 
 	public EmployeeResponse createEmployee(EmployeeCreateRequest request) {
 		if (employeeRepository.findByEmail(request.getEmail()).isPresent())
 			throw new DuplicateEmailException();
 
-		Department department = departmentService.findByIdAndStatus(request.getDepartmentId())
+		Department department = departmentRepository.findByIdAndStatus(request.getDepartmentId(), CommonStatus.ACTIVE)
 				.orElseThrow(DepartmentNotFoundException::new);
 
 		Employee newEmployee = new Employee(request.getFirstName(), request.getLastName(), request.getEmail(),
@@ -88,7 +90,7 @@ public class EmployeeService {
 		Employee employee = employeeRepository.findByIdAndStatus(id, EmployeeStatus.ACTIVE)
 				.orElseThrow(EmployeeNotFoundException::new);
 
-		Department department = departmentService.findByIdAndStatus(request.getDepartmentId())
+		Department department = departmentRepository.findByIdAndStatus(request.getDepartmentId(), CommonStatus.ACTIVE)
 				.orElseThrow(DepartmentNotFoundException::new);
 
 		employee.setDepartment(department);

@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 
 public class EmployeeCreateRequest {
@@ -22,7 +23,8 @@ public class EmployeeCreateRequest {
 
 	private String phone;
 
-	@NotBlank
+	@NotNull
+	@PositiveOrZero
 	private Long departmentId;
 
 	@NotBlank
