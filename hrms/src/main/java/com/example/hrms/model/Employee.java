@@ -2,6 +2,7 @@ package com.example.hrms.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import com.example.hrms.constant.EmployeeStatus;
 
@@ -9,11 +10,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -52,6 +55,9 @@ public class Employee {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private EmployeeStatus status;
+
+	@OneToOne(mappedBy = "employee", fetch = FetchType.LAZY)
+	private EmployeeProfile employeeProfile;
 
 	protected Employee() {
 	}
@@ -131,6 +137,10 @@ public class Employee {
 
 	public void setStatus(EmployeeStatus status) {
 		this.status = status;
+	}
+
+	public Optional<EmployeeProfile> getEmployeeProfile() {
+		return Optional.ofNullable(employeeProfile);
 	}
 
 }

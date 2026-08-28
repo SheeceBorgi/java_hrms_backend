@@ -62,7 +62,8 @@ public class EmployeeService {
 				.and(EmployeeSpecification.nameContains(filter.getSearch()))
 				.and(EmployeeSpecification.joiningDateRange(filter.getJoiningStartDate(), filter.getJoiningEndDate()))
 				.and(EmployeeSpecification.salaryRange(filter.getMinSalary(), filter.getMaxSalary()))
-				.and(EmployeeSpecification.fetchDepartment(filter.getDepartmentId()));
+				.and(EmployeeSpecification.fetchDepartment(filter.getDepartmentId()))
+				.and(EmployeeSpecification.fetchEmployeeProfile());
 
 		Page<Employee> employees = employeeRepository.findAll(employeeSpecification, pageable);
 

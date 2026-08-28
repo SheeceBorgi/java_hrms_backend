@@ -65,9 +65,10 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolationException(
 			DataIntegrityViolationException exception) {
 		Map<String, String> errors = new HashMap<>();
-		if (exception.getMessage() != null
-				&& exception.getMessage().contains("uk_employee_email")) {
+		if (exception.getMessage() != null && exception.getMessage().contains("uk_employee_email")) {
 			errors.put("message", "Email Already Taken");
+		} else if (exception.getMessage() != null && exception.getMessage().contains("uk_employee_profile_employee")) {
+			errors.put("message", "Employee Profile Already Exist");
 		} else {
 			errors.put("message", "Data Integrity Violation");
 		}

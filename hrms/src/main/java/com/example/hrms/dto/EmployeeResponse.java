@@ -16,9 +16,11 @@ public class EmployeeResponse {
 	private LocalDate joiningDate;
 	private BigDecimal salary;
 	private EmployeeStatus status;
+	private EmployeeProfileResponse employeeProfile;
 
-	public EmployeeResponse(Long id, String firstName, String lastName, String email, String phone, DepartmentResponse department,
-			String designation, LocalDate joiningDate, BigDecimal salary, EmployeeStatus employeeStatus) {
+	public EmployeeResponse(Long id, String firstName, String lastName, String email, String phone,
+			DepartmentResponse department, String designation, LocalDate joiningDate, BigDecimal salary,
+			EmployeeStatus employeeStatus, EmployeeProfileResponse employeeProfile) {
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -29,6 +31,7 @@ public class EmployeeResponse {
 		this.joiningDate = joiningDate;
 		this.salary = salary;
 		this.status = employeeStatus;
+		this.employeeProfile = employeeProfile;
 	}
 
 	public Long getId() {
@@ -69,6 +72,10 @@ public class EmployeeResponse {
 
 	public EmployeeStatus getStatus() {
 		return status;
+	}
+
+	public EmployeeProfileResponse getEmployeeProfile() {
+		return employeeProfile;
 	}
 
 }

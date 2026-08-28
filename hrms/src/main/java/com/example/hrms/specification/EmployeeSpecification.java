@@ -41,15 +41,14 @@ public class EmployeeSpecification {
 
 	public static Specification<Employee> joiningDateRange(LocalDate startDate, LocalDate endDate) {
 		return (root, query, criteriaBuilder) -> {
-			final String joiningDateAttribute = "joiningDate";
 			if (startDate != null && endDate != null) {
-				return criteriaBuilder.between(root.get(joiningDateAttribute), startDate, endDate);
+				return criteriaBuilder.between(root.get("joiningDate"), startDate, endDate);
 			}
 			if (startDate != null) {
-				return criteriaBuilder.greaterThanOrEqualTo(root.get(joiningDateAttribute), startDate);
+				return criteriaBuilder.greaterThanOrEqualTo(root.get("joiningDate"), startDate);
 			}
 			if (endDate != null) {
-				return criteriaBuilder.lessThanOrEqualTo(root.get(joiningDateAttribute), endDate);
+				return criteriaBuilder.lessThanOrEqualTo(root.get("joiningDate"), endDate);
 			}
 			return criteriaBuilder.conjunction();
 		};
@@ -57,15 +56,14 @@ public class EmployeeSpecification {
 
 	public static Specification<Employee> salaryRange(BigDecimal minSalary, BigDecimal maxSalary) {
 		return (root, query, criteriaBuilder) -> {
-			final String salaryAttribute = "salary";
 			if (minSalary != null && maxSalary != null) {
-				return criteriaBuilder.between(root.get(salaryAttribute), minSalary, maxSalary);
+				return criteriaBuilder.between(root.get("salary"), minSalary, maxSalary);
 			}
 			if (minSalary != null) {
-				return criteriaBuilder.greaterThanOrEqualTo(root.get(salaryAttribute), minSalary);
+				return criteriaBuilder.greaterThanOrEqualTo(root.get("salary"), minSalary);
 			}
 			if (maxSalary != null) {
-				return criteriaBuilder.lessThanOrEqualTo(root.get(salaryAttribute), maxSalary);
+				return criteriaBuilder.lessThanOrEqualTo(root.get("salary"), maxSalary);
 			}
 			return criteriaBuilder.conjunction();
 		};
@@ -76,6 +74,13 @@ public class EmployeeSpecification {
 			if (query.getResultType() != Long.class && query.getResultType() != long.class) {
 				root.fetch("department", JoinType.INNER);
 			}
+			return criteriaBuilder.conjunction();
+		};
+	}
+
+	public static Specification<Employee> fetchEmployeeProfile() {
+		return (root, query, criteriaBuilder) -> {
+			root.fetch("employeeProfile", JoinType.LEFT);
 			return criteriaBuilder.conjunction();
 		};
 	}

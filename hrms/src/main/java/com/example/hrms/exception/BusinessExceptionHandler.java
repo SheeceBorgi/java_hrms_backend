@@ -32,4 +32,11 @@ public class BusinessExceptionHandler {
 		ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), exception.getMessage(), false, null);
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 	}
+
+	@ExceptionHandler(ProfileAlreadyExistException.class)
+	public ResponseEntity<ApiErrorResponse> handleProfileAlreadyExistsException(
+			ProfileAlreadyExistException exception) {
+		ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), exception.getMessage(), false, null);
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+	}
 }
